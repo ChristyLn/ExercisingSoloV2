@@ -6,11 +6,7 @@
 //
 
 import SwiftUI
-struct home: View {
-    var image: CGImage?
-    private let label = Text("frame")
-    // line 10 and 11 camera variables
-    
+struct home: View {    
     @State var backgroundColor: Color = .blue
     
     var body: some View {
@@ -71,19 +67,7 @@ struct home: View {
                         .resizable()
                         .frame(width: 30, height: 30)
                         .offset(x: 100, y: -315)
-                  
-                    //camera stuff
-                    if let image = image {
-                        Image(image, scale: 1.0, orientation: .up, label: label)
-                            .resizable()
-                            
-                    } else {
-                        Color.black
-                    }
-
                 }
-                
-                
             }
         }
     }
@@ -92,24 +76,26 @@ struct home: View {
 struct profile: View {
     @State var backgroundColor: Color = .blue
     var body: some View {
-        ZStack{
-            backgroundColor.opacity(0.4)
-                .ignoresSafeArea()
-            Text("Profile")
-                .font(.system(size: 50, weight: .bold))
-                .offset(x: 0 , y: -350)
-            NavigationLink(destination: settings()) {
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: 75, height: 75)
-                    .overlay(Image(systemName: "gear")
+       NavigationStack{
+           ZStack{
+               backgroundColor.opacity(0.4)
+                   .ignoresSafeArea()
+               Text("Profile")
+                   .font(.system(size: 50, weight: .bold))
+                   .offset(x: 0 , y: -350)
+               NavigationLink(destination: settings()) {
+                   Circle()
+                       .fill(Color.blue)
+                       .frame(width: 75, height: 75)
+                       .overlay(Image(systemName: "gear")
                         .resizable()
                         .scaledToFit()
                         .padding(15)
                         .foregroundColor(.white)
-                    )
-            }
-            .offset(x: 140, y: -350)
+                       )
+               }
+               .offset(x: 140, y: -350)
+           }
         }
     }
 }

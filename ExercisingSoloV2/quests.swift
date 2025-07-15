@@ -7,69 +7,128 @@
 
 import SwiftUI
 struct quests: View {
+    
     @State var backgroundColor: Color = .blue
     var body: some View {
-        ZStack{
-            backgroundColor.opacity(0.4)
-                .ignoresSafeArea()
-            VStack{
-                //Quest Title
-                Text("Quests")
-                    .font(.system(size: 50, weight: .bold, design: .default))
-                    .offset(x:0 , y: 25)
-                //Daily Quest: 10 push-ups
-                ZStack{                    RoundedRectangle(cornerRadius: 45)
-                        .fill(.white)
-                        .frame(width: 350, height:150)
-                   HStack{
-                    VStack{
-                        Text("Daily Quest")
-                        Text("10 push-ups")
+        NavigationStack{
+            ZStack{
+                backgroundColor.opacity(0.4)
+                    .ignoresSafeArea()
+                VStack{
+                    //Quest Title
+                    Text("Quests")
+                        .font(.system(size: 50, weight: .bold, design: .default))
+                        .offset(x:0 , y: 25)
+                    //Daily Quest: 10 push-ups
+                    ZStack{                    RoundedRectangle(cornerRadius: 45)
+                            .fill(.white)
+                            .frame(width: 350, height:150)
+                        VStack{
+                            Text("Daily Quest")
+                            Text("10 push-ups")
+                        }
+                        .offset(x: -50)
+                        NavigationLink(destination: cameraView()){
+                            ZStack{
+                                RoundedRectangle(cornerRadius: 25)
+                                    .fill(Color.blue)
+                                    .frame(width: 75, height: 75)
+                                Image(systemName: "camera")
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .offset(x: 75)
                     }
-                       NavigationLink(destination: ()){
-                           
-                       }
-                }
-                //Daily Quest: 10 curl-ups
-                ZStack{
-                    RoundedRectangle(cornerRadius: 45)
-                        .fill(.white)
-                        .frame(width: 350, height:150)
-                    VStack{
-                        Text("Daily Quest")
-                        Text("10 curl-ups")
+                    //Daily Quest: 10 curl-ups
+                    ZStack{
+                        RoundedRectangle(cornerRadius: 45)
+                            .fill(.white)
+                            .frame(width: 350, height:150)
+                        VStack{
+                            Text("Daily Quest")
+                            Text("10 curl-ups")
+                        }
+                        .offset(x: -50)
+                        NavigationLink(destination: cameraView()){
+                            ZStack{
+                                RoundedRectangle(cornerRadius: 25)
+                                    .fill(Color.blue)
+                                    .frame(width: 75, height: 75)
+                                Image(systemName: "camera")
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .offset(x: 75)
+                    }
+                    //Daily Quest: 10 squats
+                    ZStack{
+                        RoundedRectangle(cornerRadius: 45)
+                            .fill(.white)
+                            .frame(width: 350, height:150)
+                        VStack{
+                            Text("Daily Quest")
+                            Text("10 squats")
+                        }
+                        .offset(x: -50)
+                        NavigationLink(destination: cameraView()){
+                            ZStack{
+                                RoundedRectangle(cornerRadius: 25)
+                                    .fill(Color.blue)
+                                    .frame(width: 75, height: 75)
+                                Image(systemName: "camera")
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .offset(x: 75)
+                    }
+                    //Daily Quest: 10,000 steps
+                    ZStack{
+                        RoundedRectangle(cornerRadius: 45)
+                            .fill(.white)
+                            .frame(width: 350, height:150)
+                        VStack{
+                            Text("Daily Quest")
+                            Text("10,000 steps")
+                        }
+                        .offset(x: -50)
+                        NavigationLink(destination: cameraView()){
+                            ZStack{
+                                RoundedRectangle(cornerRadius: 25)
+                                    .fill(Color.blue)
+                                    .frame(width: 75, height: 75)
+                                Image(systemName: "camera")
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .offset(x: 75)
                     }
                 }
-                //Daily Quest: 10 squats
-                ZStack{
-                    RoundedRectangle(cornerRadius: 45)
-                        .fill(.white)
-                        .frame(width: 350, height:150)
-                    VStack{
-                        Text("Daily Quest")
-                        Text("10 squats")
-                    }
-                }
-                //Daily Quest: 10,000 steps
-                ZStack{
-                    RoundedRectangle(cornerRadius: 45)
-                        .fill(.white)
-                        .frame(width: 350, height:150)
-                    VStack{
-                        Text("Daily Quest")
-                        Text("10,000 steps")
-                    }
-                }
-            }
-            //White tab bar
-            .offset(x: 0 , y: -30)
+                //White tab bar
+                .offset(x: 0 , y: -30)
                 Rectangle()
                     .fill(Color.white)
                     .frame(width: 400, height: 100)
                     .offset(x:0 , y: 400)
+            }
         }
     }
 }
+
+struct cameraView: View {
+    var image: CGImage?
+    private let label = Text("frame")
+    var body: some View {
+            if let image = image {
+            Image(image, scale: 1.0, orientation: .up, label: label)
+                .resizable()
+                .scaledToFit()
+                .ignoresSafeArea()
+            }else{
+            Color.black
+        }
+    }
+}
+
 #Preview {
     quests()
 }
