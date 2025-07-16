@@ -12,7 +12,7 @@ import SwiftUI
 import Vision
 import CoreML
 import UIKit
-
+//NEW VERSION
 class FrameHandler: NSObject, ObservableObject{
     @Published var frame: CGImage?
     let captureSession = AVCaptureSession()

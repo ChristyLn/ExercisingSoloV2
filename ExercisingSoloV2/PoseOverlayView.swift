@@ -7,7 +7,7 @@
 
 import SwiftUI
 import Vision
-
+//NEW VERSION
 struct PoseOverlayView: View {
         // 1.
         let bodyParts: [HumanBodyPoseObservation.JointName: CGPoint]

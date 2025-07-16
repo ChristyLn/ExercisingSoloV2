@@ -6,7 +6,9 @@
 //
 
 import SwiftUI
-struct home: View {    
+struct home: View {
+    @StateObject private var model = FrameHandler()
+    private var poseViewModel = PoseEstimationViewModel()
     @State var backgroundColor: Color = .blue
     
     var body: some View {
