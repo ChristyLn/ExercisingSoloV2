@@ -58,7 +58,7 @@ class PoseEstimationViewModel: NSObject, ObservableObject, AVCaptureVideoDataOut
         let request = DetectHumanBodyPoseRequest()
         
         do {
-            let results = try await request.perform(on: imageBuffer, orientation: .none)
+            let results = try await request.perform(on: imageBuffer, orientation: .right)
             if let observation = results.first {
                 return extractPoints(from: observation)
             }
@@ -70,7 +70,7 @@ class PoseEstimationViewModel: NSObject, ObservableObject, AVCaptureVideoDataOut
     }
 
     // 6.
-    private func extractPoints(from observation: HumanBodyPoseObservation) -> [HumanBodyPoseObservation.JointName: CGPoint] {
+    func extractPoints(from observation: HumanBodyPoseObservation) -> [HumanBodyPoseObservation.JointName: CGPoint] {
         var detectedPoints: [HumanBodyPoseObservation.JointName: CGPoint] = [:]
         let humanJoints: [HumanBodyPoseObservation.PoseJointsGroupName] = [.face, .torso, .leftArm, .rightArm, .leftLeg, .rightLeg]
         

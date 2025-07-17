@@ -7,7 +7,6 @@
 
 import SwiftUI
 struct quests: View {
-    
     @State var backgroundColor: Color = .blue
     var body: some View {
         NavigationStack{
@@ -115,16 +114,19 @@ struct quests: View {
 }
 
 struct cameraView: View {
-    var image: CGImage?
-    private let label = Text("frame")
+    @StateObject private var model = FrameHandler()
+    private var poseViewModel = PoseEstimationViewModel()
     var body: some View {
-            if let image = image {
-            Image(image, scale: 1.0, orientation: .up, label: label)
-                .resizable()
-                .scaledToFit()
-                .ignoresSafeArea()
-            }else{
-            Color.black
+        ZStack{
+            CameraFrameView(image: model.frame)
+                .edgesIgnoringSafeArea(.all)
+            PoseOverlayView(
+                bodyParts: poseViewModel.detectedBodyParts,
+                connections: poseViewModel.bodyConnections
+            ).edgesIgnoringSafeArea(.all)
+        }.task {
+            await model.checkPermission()
+            model.delegate = poseViewModel
         }
     }
 }
