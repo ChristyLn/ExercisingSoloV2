@@ -1,14 +1,13 @@
 //
-//  ContentView.swift
+//  tabs.swift
 //  ExercisingSoloV2
 //
-//  Created by 55GOParticipant on 7/11/25.
+//  Created by 55GOParticipant on 7/19/25.
 //
 
 import SwiftUI
 
-struct ContentView: View {
-    
+struct tabs: View {
     var body: some View {
         TabView{
             home()
@@ -36,6 +35,7 @@ struct ContentView: View {
     }
 }
 
+
 #Preview {
-    ContentView()
+    tabs()
 }

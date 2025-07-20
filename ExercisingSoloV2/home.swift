@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import PhotosUI
+
 struct home: View {
     @StateObject private var model = FrameHandler()
     private var poseViewModel = PoseEstimationViewModel()
@@ -69,48 +71,118 @@ struct home: View {
                         .resizable()
                         .frame(width: 30, height: 30)
                         .offset(x: 100, y: -315)
+                    Rectangle()
+                        .fill(Color.white)
+                        .frame(width: 400, height: 100)
+                        .offset(x: 0, y: 425)
                 }
             }
         }
     }
 }
 
+
 struct profile: View {
+    @State private var username = "User"
+    @State private var email = "User@example.com"
+    @State private var bio = "Lover of design and code ✨"
+    @State private var selectedPhoto: PhotosPickerItem?
+    @State private var profileImage: Image?
     @State var backgroundColor: Color = .blue
+
     var body: some View {
-       NavigationStack{
-           ZStack{
-               backgroundColor.opacity(0.4)
-                   .ignoresSafeArea()
-               Text("Profile")
-                   .font(.system(size: 50, weight: .bold))
-                   .offset(x: 0 , y: -350)
-               NavigationLink(destination: settings()) {
-                   Circle()
-                       .fill(Color.blue)
-                       .frame(width: 75, height: 75)
-                       .overlay(Image(systemName: "gear")
-                        .resizable()
-                        .scaledToFit()
-                        .padding(15)
-                        .foregroundColor(.white)
-                       )
-               }
-               .offset(x: 140, y: -350)
-           }
+        NavigationStack{
+            NavigationView {
+                    VStack(spacing: 20) {
+                        Text("Profile")
+                            .font(.system(size: 30, weight: .bold))
+                        NavigationLink(destination: settings()) {
+                                        Circle()
+                                            .fill(Color.blue)
+                                            .frame(width: 75, height: 75)
+                                            .overlay(Image(systemName: "gear")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .padding(15)
+                                                .foregroundColor(.white)
+                                            )
+                                    }
+                        .offset(x: 100)
+                        // Profile Image (default or selected)
+                        if let profileImage = profileImage {
+                            profileImage
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 200, height: 200)
+                                .clipShape(Circle())
+                        } else {
+                            Image(systemName: "person.crop.circle.fill")
+                                .resizable()
+                                .frame(width: 200, height: 200)
+                                .foregroundColor(.gray)
+                        }
+                        
+                        // Photo Picker
+                        PhotosPicker("Select Photo", selection: $selectedPhoto, matching: .images)
+                            .onChange(of: selectedPhoto) { newItem in
+                                Task {
+                                    if let data = try? await newItem?.loadTransferable(type: Data.self),
+                                       let uiImage = UIImage(data: data) {
+                                        profileImage = Image(uiImage: uiImage)
+                                    }
+                                }
+                            }
+                        
+                        // Username field
+                        TextField("Username", text: $username)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .padding(.horizontal)
+                        
+                        // Email
+                        Text(email)
+                            .foregroundColor(.secondary)
+                        
+                        // Bio
+                        TextEditor(text: $bio)
+                            .frame(height: 100)
+                            .padding()
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.2)))
+                            .padding(.horizontal)
+                        
+                        // Save Button
+                        Button("Save Changes") {
+                            // Save logic here
+                        }
+                        .buttonStyle(.borderedProminent)
+                        
+                        Spacer()
+                }
+            }
         }
     }
 }
 
+
 struct settings: View {
-    @State var backgroundColor: Color = .blue
+    @AppStorage("notificationsEnabled") private var notificationsEnabled = true
+    @AppStorage("theme") private var selectedTheme = "Light"
+    
+    let themes = ["Light", "Dark", "System"]
+    
     var body: some View {
-        ZStack{
-            backgroundColor.opacity(0.4)
-                .ignoresSafeArea()
-            Text("Settings")
-                .font(.system(size: 50, weight: .bold))
-                .offset(x: 0, y: -325)
+        NavigationView {
+            Form {
+                Section(header: Text("General")) {
+                    Toggle("Enable Notifications", isOn: $notificationsEnabled)
+                    
+                    Picker("App Theme", selection: $selectedTheme) {
+                        ForEach(themes, id: \.self) {
+                            Text($0)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Settings")
         }
     }
 }
