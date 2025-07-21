@@ -18,7 +18,7 @@ import SwiftUI
 
 struct CameraFrameView: View {
     var image: CGImage?
-    private let label = Text("frame")
+    private let label = Text(" ")
 
     var body: some View {
         if let image = image {

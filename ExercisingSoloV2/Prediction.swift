@@ -8,12 +8,21 @@ struct BodyConnection: Identifiable {
     let id = UUID()
     let from: HumanBodyPoseObservation.JointName
     let to: HumanBodyPoseObservation.JointName
+        
 }
 
 class PoseEstimationViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     
     @Published var detectedBodyParts: [HumanBodyPoseObservation.JointName: CGPoint] = [:]
     @Published var bodyConnections: [BodyConnection] = []
+    @Published var jjumpingJackCount: Int = 0
+    @Published var pushUpCount: Int = 0
+    @Published var latestObservation: HumanBodyPoseObservation?
+    var jumpingJackPrevPhase: JumpingJackPhase = .closed
+    var jumpingJackCurrentPhase: JumpingJackPhase = .closed
+    var pushPrevPhase: JumpingJackPhase = .open
+    var pushCurrentPha: JumpingJackPhase = .open
+
     
     override init() {
         super.init()
@@ -51,23 +60,36 @@ class PoseEstimationViewModel: NSObject, ObservableObject, AVCaptureVideoDataOut
         }
     }
 
-    // 5.
     func processFrame(_ sampleBuffer: CMSampleBuffer) async -> [HumanBodyPoseObservation.JointName: CGPoint]? {
         guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return nil }
-        
+
         let request = DetectHumanBodyPoseRequest()
-        
+
         do {
             let results = try await request.perform(on: imageBuffer, orientation: .right)
-            if let observation = results.first {
-                return extractPoints(from: observation)
+            guard let firstObservation = results.first else { return nil }
+            
+            let exerciSe = Exercise()
+            let (newCount, newPhase, jJackCurrentPhase) = exerciSe.jumpingJack(observation: firstObservation, currentCount: jjumpingJackCount, previousPhase: jumpingJackPrevPhase, currentPhase: jumpingJackCurrentPhase)
+            let (newCountPush, newPhasePush, pushCurrentPhase) = exerciSe.pushUp(observation: firstObservation, currentCount: pushUpCount, previousPhase: pushPrevPhase, currentPhase: pushCurrentPha)
+            
+            DispatchQueue.main.async {
+                self.jjumpingJackCount = newCount
+                self.jumpingJackPrevPhase = newPhase
+                self.latestObservation = firstObservation
+                self.jumpingJackCurrentPhase = jJackCurrentPhase
+                self.pushUpCount = newCountPush
+                self.pushPrevPhase = newPhasePush
+                self.pushCurrentPha = pushCurrentPhase
             }
+
+            return extractPoints(from: firstObservation)
         } catch {
             print("Error processing frame: \(error.localizedDescription)")
+            return nil
         }
-
-        return nil
     }
+
 
     // 6.
     func extractPoints(from observation: HumanBodyPoseObservation) -> [HumanBodyPoseObservation.JointName: CGPoint] {
