@@ -162,31 +162,65 @@ struct profile: View {
     }
 }
 
+import SwiftUI
 
 struct settings: View {
     @AppStorage("notificationsEnabled") private var notificationsEnabled = true
     @AppStorage("theme") private var selectedTheme = "Light"
-    
-    let themes = ["Light", "Dark", "System"]
-    
+
+    let themes = ["Light", "Dark", "Systems"]
+
+    private var backgroundColor: Color {
+        switch selectedTheme.lowercased() {
+        case "dark": return .black
+        case "light": return .white
+        default: return Color(UIColor.systemBackground)
+        }
+    }
+
+    private var textColor: Color {
+        switch selectedTheme.lowercased() {
+        case "dark": return .white
+        case "light": return .black
+        default: return Color.primary
+        }
+    }
+
+    private var sectionBackgroundColor: Color {
+        selectedTheme.lowercased() == "dark" ? .black : .white
+    }
+
     var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("General")) {
-                    Toggle("Enable Notifications", isOn: $notificationsEnabled)
-                    
-                    Picker("App Theme", selection: $selectedTheme) {
-                        ForEach(themes, id: \.self) {
-                            Text($0)
+        NavigationStack {
+            ZStack {
+                backgroundColor
+                    .ignoresSafeArea()
+
+                Form {
+                    Section(header: Text("General").foregroundColor(textColor)) {
+                        Toggle(isOn: $notificationsEnabled) {
+                            Text("Enable Notifications")
+                                .foregroundColor(textColor)
                         }
+
+                        Picker(selection: $selectedTheme,
+                               label: Text("App Theme")
+                                .foregroundColor(textColor)) {
+                            ForEach(themes, id: \.self) { theme in
+                                Text(theme)
+                                    .foregroundColor(textColor) // Changes dropdown item color
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle()) // Menu style to allow dropdown customization
                     }
+                    .listRowBackground(sectionBackgroundColor)
                 }
+                .scrollContentBackground(.hidden)
             }
             .navigationTitle("Settings")
         }
     }
 }
-
 #Preview {
     home()
 }
