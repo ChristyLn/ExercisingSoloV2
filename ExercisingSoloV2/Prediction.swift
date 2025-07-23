@@ -20,8 +20,8 @@ class PoseEstimationViewModel: NSObject, ObservableObject, AVCaptureVideoDataOut
     @Published var latestObservation: HumanBodyPoseObservation?
     var jumpingJackPrevPhase: JumpingJackPhase = .closed
     var jumpingJackCurrentPhase: JumpingJackPhase = .closed
-    var pushPrevPhase: JumpingJackPhase = .open
-    var pushCurrentPha: JumpingJackPhase = .open
+    var pushPrevPhase: HeadPosition = .up
+    var pushCurrentPha: HeadPosition = .up
 
     
     override init() {
@@ -71,16 +71,16 @@ class PoseEstimationViewModel: NSObject, ObservableObject, AVCaptureVideoDataOut
             
             let exerciSe = Exercise()
             let (newCount, newPhase, jJackCurrentPhase) = exerciSe.jumpingJack(observation: firstObservation, currentCount: jjumpingJackCount, previousPhase: jumpingJackPrevPhase, currentPhase: jumpingJackCurrentPhase)
-            let (newCountPush, newPhasePush, pushCurrentPhase) = exerciSe.pushUp(observation: firstObservation, currentCount: pushUpCount, previousPhase: pushPrevPhase, currentPhase: pushCurrentPha)
+            //let (newCountPush, newPhasePush, pushCurrentPhase) = exerciSe.pushUp(observation: firstObservation, currentCount: pushUpCount, previousPhase: pushPrevPhase, currentPhase: pushCurrentPha)
             
             DispatchQueue.main.async {
                 self.jjumpingJackCount = newCount
                 self.jumpingJackPrevPhase = newPhase
                 self.latestObservation = firstObservation
                 self.jumpingJackCurrentPhase = jJackCurrentPhase
-                self.pushUpCount = newCountPush
-                self.pushPrevPhase = newPhasePush
-                self.pushCurrentPha = pushCurrentPhase
+//                self.pushUpCount = newCountPush
+//                self.pushPrevPhase = newPhasePush
+//                self.pushCurrentPha = pushCurrentPhase
             }
 
             return extractPoints(from: firstObservation)

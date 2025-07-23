@@ -116,12 +116,16 @@ struct quests: View {
 
 struct cameraViewJumpingJacks: View {
     @StateObject private var model = FrameHandler()
-    @State private var jumpingJackCount = 0
+    @State private var jumpingJackCount:Int = 0
     @State private var prevPhase = JumpingJackPhase.closed
     @State private var currentPhase = JumpingJackPhase.closed
     private var poseViewModel = PoseEstimationViewModel()
     private var exercise = Exercise()
-    let goal = 10
+    @AppStorage("coins") private var coins = 0
+    @AppStorage("exp") private var exp:Double = 0.0
+    @AppStorage("level") private var level = 0
+    @AppStorage("expTotalLevelToNext") private var expTotalLevelToNext:Double = 200.0
+    let goal:Int = 10
 
     var body: some View {
         ZStack {
@@ -135,11 +139,29 @@ struct cameraViewJumpingJacks: View {
             Rectangle()
                 .fill(Color.red)
                 .frame(width:200, height:100)
-                .offset(x: -280, y: -430)
+                .offset(x: 0, y: -430)
             Text("\(jumpingJackCount)")
                 .font(.system(size: 84))
                 .foregroundColor(.white)
-                .offset(x: -280, y: -430)
+                .offset(x: 0, y: -430)
+            if jumpingJackCount >= goal {
+                Group{
+                    Text("You did it! Here's your rewards! You are not free to exit out")
+                        .font(.system(size: 32))
+                        .foregroundColor(.white)
+                    Text("+100 coins")
+                        .font(.system(size: 32))
+                        .foregroundColor(.white)
+                        .offset(x: 0, y: -40)
+                    Text("+100 XP")
+                        .font(.system(size: 32))
+                        .foregroundColor(.white)
+                        .offset(x: 0, y: 40)
+                }.onAppear(){
+                    levelUp()
+                    print("coins: \(coins) exp: \(exp) level: \(level)")
+                }
+            }
         }
         .task {
             await model.checkPermission()
@@ -154,14 +176,24 @@ struct cameraViewJumpingJacks: View {
             }
         }
     }
+    
+    func levelUp() {
+        coins = coins + 100
+        exp = exp + 100
+        if exp >= expTotalLevelToNext {
+            level = level + 1
+            exp = exp - expTotalLevelToNext
+            expTotalLevelToNext = expTotalLevelToNext * 1.2
+        }
+    }
 }
 
 
 struct cameraViewPushUps: View {
     @StateObject private var model = FrameHandler()
     @State private var pushUpCount = 0
-    @State private var prevPhase = JumpingJackPhase.closed
-    @State private var currentPhase = JumpingJackPhase.closed
+    @State private var prevPhase = HeadPosition.up
+    @State private var pcurrentPhase = HeadPosition.up
     private var poseViewModel = PoseEstimationViewModel()
     private var exercise = Exercise()
     let goal = 10
@@ -177,15 +209,21 @@ struct cameraViewPushUps: View {
                 .fill(Color.red)
                 .frame(width:200, height:100)
                 .offset(x: -280, y: -430)
-            Text("\(poseViewModel.pushUpCount)")
+            Text("\(pushUpCount)")
                 .font(.system(size: 84))
                 .foregroundColor(.white)
                 .offset(x: -280, y: -430)
-            
-            
         }.task {
             await model.checkPermission()
             model.delegate = poseViewModel
+        }
+        .onReceive(poseViewModel.$latestObservation.compactMap { $0 }) { observation in
+            let (newCount, oldPhase,currentPhase) = exercise.pushUp(observation: observation, currentCount: pushUpCount, previousPhase: prevPhase, currentPhase: pcurrentPhase)
+            prevPhase = oldPhase
+            pcurrentPhase = currentPhase
+            if newCount != pushUpCount {
+                pushUpCount = newCount
+            }
         }
     }
 }
